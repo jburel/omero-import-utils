@@ -110,21 +110,27 @@ def handle_image(store, zarr_uri):
     write_xml(ome, object_name)    
 
 
-if len(sys.argv) < 2:
-    print("Error: Please provide the Zarr URI as a command line argument")
-    print("Usage: python zarr_ome_xml.py <zarr_uri>")
-    sys.exit(1)
+def main():
+    if len(sys.argv) < 2:
+        print("Error: Please provide the Zarr URI as a command line argument")
+        print("Usage: python zarr_ome_xml.py <zarr_uri>")
+        sys.exit(1)
 
-zarr_uri = sys.argv[1]
-with open(f"{zarr_uri}/.zattrs") as f:
-    zattrs = json.load(f)
+    zarr_uri = sys.argv[1]
+    with open(f"{zarr_uri}/.zattrs") as f:
+        zattrs = json.load(f)
 
-if "plate" in zattrs:
-    store = FSStore(zarr_uri)
-    handle_plate(store, zarr_uri)
-else:
-    if "bioformats2raw.layout" in zattrs and zattrs["bioformats2raw.layout"] == 3:
-        store = FSStore(f"{zarr_uri}/0")
-    else:
+    if "plate" in zattrs:
         store = FSStore(zarr_uri)
-    handle_image(store, zarr_uri)
+        handle_plate(store, zarr_uri)
+    else:
+        if "bioformats2raw.layout" in zattrs and zattrs["bioformats2raw.layout"] == 3:
+            store = FSStore(f"{zarr_uri}/0")
+        else:
+            store = FSStore(zarr_uri)
+        handle_image(store, zarr_uri)
+
+
+
+if __name__ == "__main__":
+    main()
