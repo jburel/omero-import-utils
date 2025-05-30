@@ -69,8 +69,8 @@ def handle_plate(store, zarr_uri):
             well_sample = WellSample(id=WellSampleID("WellSample:%s" % well_sample_id_counter), index=index)
             well_sample_id_counter += 1
             well_sample_path = f"{well_path}/{sample_attrs['path']}"
-            image_json =  json.loads(store.get(f"{well_sample_path}/.zattrs"))
-            array_path =  f"{well_sample_path}/{image_json["multiscales"][0]["datasets"][0]["path"]}"
+            image_json = json.loads(store.get(f"{well_sample_path}/.zattrs"))
+            array_path = ""#f"{well_sample_path}/{image_json["multiscales"][0]["datasets"][0]["path"]}"
             array_data = da.from_zarr(store, array_path)
             sizes = {}
             shape = array_data.shape
@@ -116,7 +116,8 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 zarr_uri = sys.argv[1]
-zattrs = json.load(open(f"{zarr_uri}/.zattrs"))
+with open(f"{zarr_uri}/.zattrs") as f:
+    zattrs = json.load(f)
 
 if "plate" in zattrs:
     store = FSStore(zarr_uri)
